@@ -1,6 +1,0 @@
-
-# inicial_disturbance
-
-# restoration
-
-# ....
