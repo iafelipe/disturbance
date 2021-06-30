@@ -9,3 +9,5 @@
 
 # todo **args/**kwargs
 # def run(parameters, scenario, inicial_disturbance)
+
+# folders: cy, img, output
