@@ -1,10 +1,13 @@
 title: Projeto Distúrbio
 author: Igor Felipe
 email: igorafelipe@gmail.com
-description: "O papel da ocorrência de distúrbios no processo de invasão biológica e manutenção da diversidade em paisagens dinâmicas"
+description: >-
+  O papel da ocorrência de distúrbios no processo de invasão biológica 
+  e manutenção da diversidade em paisagens dinâmicas
 baseurl: "disturbance"
 url: ""
 github_username: iafelipe
+linkedin: iafelipe
 
 # Build settings
 theme: minima
