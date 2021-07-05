@@ -5,12 +5,16 @@ description: "Projeto de iniciação científica na área de ecologia teórica"
 baseurl: "disturbance"
 url: ""
 github_username: iafelipe
-linkedin: https://www.linkedin.com/in/iafelipe
 
 # Build settings
 theme: minima
 plugins:
   - jekyll-feed
+
+minima:
+  social_links:
+    github: iafelipe
+    linkedin: iafelipe
 
 # Exclude from processing.
 # The following items will not be processed, by default.
