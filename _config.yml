@@ -2,16 +2,9 @@ title: Projeto Distúrbio
 author: Igor Felipe
 email: igorafelipe@gmail.com
 description: "Projeto de iniciação científica na área de ecologia teórica"
-baseurl: "disturbance"
+# baseurl: "disturbance"
 url: ""
-# github_username: iafelipe
-
-show_excerpts: true
-
-minima:
-  social_links:
-    github:  iafelipe
-    linkedin: iafelipe
+github_username: iafelipe
 
 # Build settings
 theme: minima
