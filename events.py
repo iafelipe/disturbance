@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from numba import vectorize
-
-# TODO remove return tuples in @vectorized functions
 
 
-@vectorize
+@np.vectorize
 def kn_update(landscape):
     """
     retorna a capacidade de suporte da sp. nativa de acordo com a qualidade dos patches
@@ -32,7 +29,7 @@ def kn_update(landscape):
     return kn
 
 
-@vectorize
+@np.vectorize
 def ke_update(landscape):
     """
     retorna a capacidade de suporte da espécie exótica de acordo com a qualidade do patch
@@ -58,97 +55,40 @@ def ke_update(landscape):
     return ke
 
 
-# @vectorize
-# def lotka_volterra(pop1, pop2, r, alfa_or_beta, k):
-#     """
-
-#     Parameters
-#     ----------
-#     natpop : numpy array
-#         array contendo a população nativa de todos os patches
-
-#     exopop : numpy array
-#         array contendo a população exótica de todos os patches
-
-#     r_n : integer or real
-#         taxa de crescimento intrínseca da sp. nativa
-
-#     r_e : integer or real
-#         taxa de crescimento intrínseca da sp. exótica
-
-#     alfa : float
-#         efeito de um indivíduo da sp. exótica sobre um indivíduo da sp. nativa
-
-#     beta : float
-#         efeito de um indivíduo da sp. nativa sobre um indivíduo da sp. exótica
-
-#     kn : numpy array
-#         array contendo a qualidade de suporte da sp. nativa de todos os patches
-
-#     ke : numpy array
-#         array contendo a qualidade de suporte da sp. exótica de todos os patches
-        
-#     Returns
-#     -------
-#     natpop : numpy array
-#         array contendo a população nativa atualizada
-
-#     exopop : numpy array
-#         array contendo a população exótica atualizada
-
-#     """
-       
-#     updated_pop1 = pop1 * (1 + r * (1 - ((pop1 + alfa_or_beta * pop2) / k)))
-
-#     return updated_pop1
-
-@guvectorize
-def lotka_volterra(natpop, exopop, r_n, r_e, alfa, beta, kn, ke):
+@np.vectorize
+def lotka_volterra(pop1, pop2, r, alfa_or_beta, k):
     """
 
     Parameters
     ----------
-    natpop : numpy array
-        array contendo a população nativa de todos os patches
-        
-    exopop : numpy array
-        array contendo a população exótica de todos os patches
-        
-    r_n : integer or real
-        taxa de crescimento intrínseca da sp. nativa
-        
-    r_e : integer or real
-        taxa de crescimento intrínseca da sp. exótica
-        
-    alfa : float
-        efeito de um indivíduo da sp. exótica sobre um indivíduo da sp. nativa
-        
-    beta : float
-        efeito de um indivíduo da sp. nativa sobre um indivíduo da sp. exótica
-        
-    kn : numpy array
-        array contendo a qualidade de suporte da sp. nativa de todos os patches
-        
-    ke : numpy array
-        array contendo a qualidade de suporte da sp. exótica de todos os patches
+    pop1 : numpy array
+        array contendo a população 1 de todos os patches
+
+    pop2 : numpy array
+        array contendo a população 2 de todos os patches
+
+    r : integer or real
+        taxa de crescimento intrínseca da sp. 1
+
+    alfa_or_beta : float
+        efeito de um indivíduo da sp. 2 sobre um indivíduo da sp. 1
+
+    k : numpy array
+        array contendo a qualidade de suporte da sp. 1 de todos os patches
         
     Returns
     -------
-    natpop : numpy array
-        array contendo a população nativa atualizada
-        
-    exopop : numpy array
-        array contendo a população exótica atualizada
+    updated_pop1 : numpy array
+        array contendo a população 1 atualizada
 
     """
-   
-    updated_natpop = natpop * (1 + r_n * (1 - ((natpop + alfa * exopop) / kn)))
-    updated_exopop = exopop * (1 + r_e * (1 - ((exopop + beta * natpop) / ke)))
+       
+    updated_pop1 = pop1 * (1 + r * (1 - ((pop1 + alfa_or_beta * pop2) / k)))
 
-    return updated_natpop, updated_exopop
+    return updated_pop1
 
 
-@vectorize
+@np.vectorize
 def breque(x):
     """ verifica valores próximos de 0 """
     
@@ -158,7 +98,7 @@ def breque(x):
         return x
 
 
-@vectorize
+@np.vectorize
 def random_disturbance(rng, landscape, p):
     """
     distúrbio do padrão aleatório
@@ -190,7 +130,7 @@ def random_disturbance(rng, landscape, p):
     return landscape
 
 
-@vectorize
+@np.vectorize
 def clustered_disturbance(rng, landscape, p, q00, neighbors_info, iterations=1000000):
     """
     distúrbio do padrão agregado
@@ -293,7 +233,7 @@ def clustered_disturbance(rng, landscape, p, q00, neighbors_info, iterations=100
     return landscape
 
 
-@vectorize
+@np.vectorize
 def restoration(rng, landscape, pr):
     """
     evento de restauração da paisagem
@@ -391,10 +331,10 @@ def campo_medio(pop):
     return cm, pop
 
 
-@vectorize(['float64(float64, float64)'])
-def migrantes(pop, migration_rate):
+@np.vectorize
+def calc_migrantes(pop, migration_rate):
     """
-    calcula os migrantes e os retira da população
+    calcula os migrantes
 
     Parameters
     ----------
@@ -409,15 +349,9 @@ def migrantes(pop, migration_rate):
     migrantes: numpy array
         array contendo os migrantes
         
-    pop: numpy array
-       array contendo a população atualizada sem os migrantes
-
     """
     
-    migrantes = pop * migration_rate
-    pop -= migrantes
-    
-    return migrantes, pop
+    return pop * migration_rate
 
 
 def migracao(rng, migrantes, pop, neighbors_info):
@@ -448,7 +382,7 @@ def migracao(rng, migrantes, pop, neighbors_info):
     it = np.nditer(migrantes, flags=['multi_index'])
     for x in it:
         neighbors = neighbors_info[it.multi_index[0] * 50 + it.multi_index[1]]
-        current_migrantes = x
+        current_migrantes = np.copy(x)
            
         while current_migrantes >= 1:
             current_neighbor = neighbors[rng.integers(neighbors.shape[0])]
@@ -457,3 +391,25 @@ def migracao(rng, migrantes, pop, neighbors_info):
 
     return pop
 
+
+@np.vectorize
+def remove_migrantes(pop, migrantes):
+    """
+    retira os migrantes de seus patches antigos
+
+    Parameters
+    ----------
+    pop : numpy array
+        array contendo a população
+        
+    migrantes: numpy array
+        array contendo os migrantes
+
+    Returns
+    -------
+    pop : numpy array
+        array contendo a população atualizada sem os migrantes
+        
+    """
+    
+    return pop - migrantes
